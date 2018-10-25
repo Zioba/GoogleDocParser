@@ -96,9 +96,13 @@ class SpreadsheetTools:
     def setSheet(self, sheetName):
         self.sheetTitle = sheetName
 
+    def setSheetNumbId(self, sheetName):
+        self.sheetId = 1254758776
+
+
     # spreadsheets.batchUpdate and spreadsheets.values.batchUpdate
     def runPrepared(self, valueInputOption="USER_ENTERED"):
-        if self.spreadsheetId is None:
+        if self.sheetTitle is None:
             raise SpreadsheetNotSetError()
         upd1Res = {'replies': []}
         upd2Res = {'responses': []}
@@ -137,7 +141,7 @@ class SpreadsheetTools:
     #   "A3:B4" -> {sheetId: id of current sheet, startRowIndex: 2, endRowIndex: 4, startColumnIndex: 0, endColumnIndex: 2}
     #   "A5:B"  -> {sheetId: id of current sheet, startRowIndex: 4, startColumnIndex: 0, endColumnIndex: 2}
     def toGridRange(self, cellsRange):
-        if self.sheetId is None:
+        if self.sheetTitle is None:
             raise SheetNotSetError()
         if isinstance(cellsRange, str):
             startCell, endCell = cellsRange.split(":")[0:2]

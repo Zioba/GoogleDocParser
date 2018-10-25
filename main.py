@@ -1,6 +1,7 @@
 import requests, bs4
 import httplib2
 import apiclient.discovery
+import datetime
 from oauth2client.service_account import ServiceAccountCredentials
 from SpreadsheetTools import SpreadsheetTools
 
@@ -25,8 +26,8 @@ def main():
     service = apiclient.discovery.build('sheets', 'v4', http = httpAuth)
     request = service.spreadsheets().get(spreadsheetId= docId, ranges= [], includeGridData= False)
     response = request.execute()
-
-    #request = service.spreadsheets().values().get(spreadsheetId=docId, range="Сие есть название листа!A:A")
+#чары 12 лист
+    '''
     request = service.spreadsheets().values().get(spreadsheetId=docId, range="Чары 12!A:A")
     response = request.execute()
     charNicknames = response.get('values')
@@ -56,9 +57,7 @@ def main():
                 t += 1
                 continue
         t += 1
-
-
-
+#чары 20 лист мейны
     tools.setSheet('Чары 20')
     request = service.spreadsheets().values().get(spreadsheetId=docId, range="Чары 20!A:A")
     response = request.execute()
@@ -89,7 +88,7 @@ def main():
                 t += 1
                 continue
         t += 1
-
+#чары 20 лист твинки
     request = service.spreadsheets().values().get(spreadsheetId=docId, range="Чары 20!D:D")
     response = request.execute()
     charNicknames = response.get('values')
@@ -115,6 +114,47 @@ def main():
                 values = 'E' + str(t + 1) + ':F' + str(t + 1);
                 tools.prepare_setValues(values,
                                         [['error', 'error']])
+                tools.runPrepared()
+                t += 1
+                continue
+        t += 1
+    '''
+    tools.setSheet('Доступы')
+    tools.setSheetNumbId('Доступы') #функция костыльная, там забит id листа вручную
+    request = service.spreadsheets().values().get(spreadsheetId=docId, range="Доступы!A:A")
+    response = request.execute()
+    tools.prepare_setValues("H1:H1", [[str(datetime.datetime.now().date())]])
+    tools.runPrepared()
+    charNicknames = response.get('values')
+    t = 0;
+    for i in charNicknames:
+        if (t != 0):
+            try:
+                player = getCharNickname(i)
+                URL = 'https://eu.api.battle.net/wow/character/ревущий-фьорд/' + player + '?fields=guild&locale=ru_RU&apikey=a54rf7cgky8w4nt6hwjt67bwkdmkkpbp'
+                r = requests.get(URL)
+                json = r.json()
+                print(json)
+
+                guild = json.get('guild')
+                guildName = guild.get('name')
+                values = 'D' + str(t + 1) + ':E' + str(t + 1);
+                if (guildName == 'Спектр'):
+                    tools.prepare_setValues(values, [['OK' , guildName]])
+                    tools.runPrepared()
+                    tools.prepare_setCellsFormats(values,[[{'backgroundColor': {'red': 0, 'green': 1, 'blue': 0}},
+                                                           {'backgroundColor': {'red': 1, 'green': 1, 'blue': 1}}]])
+                    tools.runPrepared()
+                else:
+                    tools.prepare_setValues(values, [['чел не в гильдии', guildName]])
+                    tools.runPrepared()
+                    tools.prepare_setCellsFormats(values, [[{'backgroundColor': {'red': 1, 'green': 0, 'blue': 0}},
+                                                            {'backgroundColor': {'red': 1, 'green': 1, 'blue': 1}}]])
+                    tools.runPrepared()
+            except:
+                values = 'D' + str(t + 1) + ':E' + str(t + 1);
+                tools.prepare_setValues(values,
+                                        [['персонажа не существует', 'error']])
                 tools.runPrepared()
                 t += 1
                 continue
